@@ -38,7 +38,7 @@ class Board:
 
     # check if there are 4 in a row in any direction
     def check_win(self, row, column, player):
-        return self._check_horizontal_win(row, column, player) or self._check_vertical_win(row, column, player) 
+        return self._check_horizontal_win(row, column, player) or self._check_vertical_win(row, column, player) or self._check_positive_diagonal_win(row, column, player) or self._check_negative_diagonal_win(row, column, player)
 
     # go right and check if there are 4 right in a row
     def _check_horizontal_win(self, row, column, player):
@@ -55,3 +55,21 @@ class Board:
         if (row < 3 and self.board[row+1][column] == player and self.board[row+2][column] == player and self.board[row+3][column] == player):
             return True
         return False
+
+    # go left and down and check if there are 4 right up in a row
+    def _check_positive_diagonal_win(self, row, column, player):
+        for i in range(0,  4, 1):
+            if (column-i > 3 or column - i < 0 or row+i < 3 or row+i > 5):
+                continue
+            if (self.board[row+i][column-i] == player and self.board[row+i-1][column-i+1] == player and self.board[row+i-2][column-i+2] == player and self.board[row+i-3][column-i+3] == player):
+                return True
+        return False
+
+    # go left and up and check if there are 4 right down in a row
+    def _check_negative_diagonal_win(self, row, column, player):
+        for i in range(0,  4, 1):
+            if (column-i > 3 or column - i < 0 or row-i > 2 or row-i < 0):
+                continue
+            if (self.board[row-i][column-i] == player and self.board[row-i+1][column-i+1] == player and self.board[row-i+2][column-i+2] == player and self.board[row-i+3][column-i+3] == player):
+                return True
+            return False
