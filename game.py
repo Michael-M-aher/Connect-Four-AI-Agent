@@ -11,3 +11,53 @@ class Game:
         self.player2 = BLUE
         self.game_over = False
         self.board = Board()
+
+    def player1Turn(self):
+        column = int(input(
+            "Player 1, it's your turn ,enter the column number you want to drop your piece in(1-7): "))
+        if (column < 1 or column > 7):
+            print("Invalid column number, please enter a number between 1 and 7")
+            self.player1Turn()
+            return
+        column = column - 1
+        row, column = self.board.place_piece(column, self.player1)
+        if row == -1 and column == -1:
+            print("Column is full, please choose another column")
+            self.player1Turn()
+            return
+        print(row, column)
+        if (self.board.check_win(row, column, self.player1)):
+            self.board.print_grid()
+            print("Player 1 wins!")
+            self.game_over = True
+            return
+        if self.board.check_draw():
+            self.board.print_grid()
+            print("Draw!")
+            self.game_over = True
+            return
+
+    def player2Turn(self):
+        column = int(input(
+            "Player 2, it's your turn ,enter the column number you want to drop your piece in(1-7): "))
+        if (column < 1 or column > 7):
+            print("Invalid column number, please enter a number between 1 and 7")
+            self.player2Turn()
+            return
+        column = column - 1
+        row, column = self.board.place_piece(column, self.player2)
+        if row == -1 and column == -1:
+            print("Column is full, please choose another column")
+            self.player2Turn()
+            return
+        print(row, column)
+        if (self.board.check_win(row, column, self.player2)):
+            self.board.print_grid()
+            print("Player 2 wins!")
+            self.game_over = True
+            return
+        if self.board.check_draw():
+            self.board.print_grid()
+            print("Draw!")
+            self.game_over = True
+            return
