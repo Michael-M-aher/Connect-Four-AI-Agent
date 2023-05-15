@@ -1,81 +1,99 @@
+from PIL import ImageGrab
+import pyautogui
+
+# YOU MAY NEED TO CHANGE THESE VALUES BASED ON YOUR SCREEN SIZE
+LEFT = 583
+TOP = 228
+RIGHT = 1339
+BOTTOM = 876
+
+XSHIFT = 109
+YSHIFT = 107
+
 EMPTY = 0
 RED = 1
 BLUE = 2
 
 
 class Board:
-    def __init__(self, numRows=6, numColumns=7) -> None:
-        self.numRows = numRows
-        self.numColumns = numColumns
-        self.board = [[EMPTY for i in range(numColumns)]
-                      for j in range(numRows)]
-        self.empty_spaces = (numRows*numColumns)
+    def __init__(self) -> None:
+        self.board = [[EMPTY for i in range(7)] for j in range(6)]
 
-    def print_grid(self):
-        for i in range(0, len(self.board)):
-            for j in range(0, len(self.board[i])):
-                if self.board[i][j] == EMPTY:
-                    print("*", end=" ")
-                elif self.board[i][j] == RED:
-                    print("R", end=" ")
-                elif self.board[i][j] == BLUE:
-                    print("B", end=" ")
+    def print_grid(self, grid):
+        print("######################################################################")
+        for i in range(0, len(grid)):
+            for j in range(0, len(grid[i])):
+                if grid[i][j] == EMPTY:
+                    print("*", end=" \t")
+                elif grid[i][j] == RED:
+                    print("R", end=" \t")
+                elif grid[i][j] == BLUE:
+                    print("B", end=" \t")
             print("\n")
+        print("######################################################################")
+
+    def _convert_grid_to_color(self, grid):
+        for i in range(0, len(grid)):
+            for j in range(0, len(grid[i])):
+                if grid[i][j] == (255, 255, 255):
+                    grid[i][j] = EMPTY
+                elif grid[i][j][0] > 200:
+                    grid[i][j] = RED
+                elif grid[i][j][0] > 50:
+                    grid[i][j] = BLUE
+        return grid
+
+    def _get_grid_cordinates(self):
+        startCord = (50, 55)
+        cordArr = []
+        for i in range(0, 7):
+            for j in range(0, 6):
+                x = startCord[0] + i * XSHIFT
+                y = startCord[1] + j * YSHIFT
+                cordArr.append((x, y))
+        return cordArr
+
+    def _transpose_grid(self, grid):
+        return [[grid[j][i] for j in range(len(grid))] for i in range(len(grid[0]))]
+
+    def _capture_image(self):
+        image = ImageGrab.grab()
+        cropedImage = image.crop((LEFT, TOP, RIGHT, BOTTOM))
+        return cropedImage
+
+    def _convert_image_to_grid(self, image):
+        pixels = [[] for i in range(7)]
+        i = 0
+        for index, cord in enumerate(self._get_grid_cordinates()):
+            pixel = image.getpixel(cord)
+            if index % 6 == 0 and index != 0:
+                i += 1
+            pixels[i].append(pixel)
+        return pixels
+
+    def _get_grid(self):
+        cropedImage = self._capture_image()
+        pixels = self._convert_image_to_grid(cropedImage)
+        # cropedImage.show()
+        grid = self._transpose_grid(pixels)
+        return grid
+
+    def _check_if_game_end(self, grid):
+        for i in range(0, len(grid)):
+            for j in range(0, len(grid[i])):
+                if grid[i][j] == EMPTY and self.board[i][j] != EMPTY:
+                    return True
+        return False
 
     def get_game_grid(self):
-        return self.board
+        game_grid = self._get_grid()
+        new_grid = self._convert_grid_to_color(game_grid)
+        is_game_end = self._check_if_game_end(new_grid)
+        self.board = new_grid
+        return (self.board, is_game_end)
 
-    def getNumColumns(self):
-        return self.numColumns
-
-    # place a piece in the column and return the row and column of the piece
-    def place_piece(self, column, player):
-        for i in range(len(self.board)-1, -1, -1):
-            row = self.board[i]
-            if row[column] == EMPTY:
-                row[column] = player
-                self.empty_spaces -= 1
-                return i, column
-        return -1, -1
-
-    # check if the board is full
-    def check_draw(self):
-        return (self.empty_spaces == 0)
-
-    # check if there are 4 in a row in any direction
-    def check_win(self, row, column, player):
-        return self._check_horizontal_win(row, column, player) or self._check_vertical_win(row, column, player) or self._check_positive_diagonal_win(row, column, player) or self._check_negative_diagonal_win(row, column, player)
-
-    # go right and check if there are 4 right in a row
-    def _check_horizontal_win(self, row, column, player):
-        for i in range(column, column - 4, -1):
-            if (i > (self.numColumns-4) or i < 0):
-                continue
-            r = self.board[row]
-            if (r[i] == player and r[i+1] == player and r[i+2] == player and r[i+3] == player):
-                return True
-        return False
-
-    # go down and check if there are 4 up in a row
-    def _check_vertical_win(self, row, column, player):
-        if (row < (self.numRows-3) and self.board[row+1][column] == player and self.board[row+2][column] == player and self.board[row+3][column] == player):
-            return True
-        return False
-
-    # go left and down and check if there are 4 right up in a row
-    def _check_positive_diagonal_win(self, row, column, player):
-        for i in range(0,  4, 1):
-            if (column-i > (self.numColumns-4) or column - i < 0 or row+i < 3 or row+i > (self.numRows-1)):
-                continue
-            if (self.board[row+i][column-i] == player and self.board[row+i-1][column-i+1] == player and self.board[row+i-2][column-i+2] == player and self.board[row+i-3][column-i+3] == player):
-                return True
-        return False
-
-    # go left and up and check if there are 4 right down in a row
-    def _check_negative_diagonal_win(self, row, column, player):
-        for i in range(0,  4, 1):
-            if (column-i > (self.numColumns-4) or column - i < 0 or row-i > (self.numRows-4) or row-i < 0):
-                continue
-            if (self.board[row-i][column-i] == player and self.board[row-i+1][column-i+1] == player and self.board[row-i+2][column-i+2] == player and self.board[row-i+3][column-i+3] == player):
-                return True
-            return False
+    def select_column(self, column):
+        pyautogui.click(
+            self._get_grid_cordinates()[(column-1)*6][0] + LEFT,
+            self._get_grid_cordinates()[(column-1)*6][1] + TOP,
+        )

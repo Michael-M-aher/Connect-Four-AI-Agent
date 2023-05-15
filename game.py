@@ -1,65 +1,40 @@
 from board import Board
+from connect_four import ConnectFour
+import time
+import random
 
-EMPTY = 0
-RED = 1
-BLUE = 2
+# GAME LINK
+# http://kevinshannon.com/connect4/
 
 
-class Game:
-    def __init__(self):
-        self.player1 = RED
-        self.player2 = BLUE
-        self.game_over = False
-        self.board = Board()
+def main():
+    board = Board()
 
-    def player1Turn(self):
-        column = int(input(
-            f"Player 1, it's your turn ,enter the column number you want to drop your piece in(1-{self.board.getNumColumns()}): "))
-        if (column < 1 or column > self.board.getNumColumns()):
-            print(
-                f"Invalid column number, please enter a number between 1 and {self.board.getNumColumns()}")
-            self.player1Turn()
-            return
-        column = column - 1
-        row, column = self.board.place_piece(column, self.player1)
-        if row == -1 and column == -1:
-            print("Column is full, please choose another column")
-            self.player1Turn()
-            return
-        print(row, column)
-        if (self.board.check_win(row, column, self.player1)):
-            self.board.print_grid()
-            print("Player 1 wins!")
-            self.game_over = True
-            return
-        if self.board.check_draw():
-            self.board.print_grid()
-            print("Draw!")
-            self.game_over = True
-            return
+    time.sleep(2)
+    game_end = False
+    b = []
+    while not game_end:
+        (game_board, game_end) = board.get_game_grid()
 
-    def player2Turn(self):
-        column = int(input(
-            f"Player 2, it's your turn ,enter the column number you want to drop your piece in(1-{self.board.getNumColumns()}): "))
-        if (column < 1 or column > self.board.getNumColumns()):
-            print(
-                f"Invalid column number, please enter a number between 1 and {self.board.getNumColumns()}")
-            self.player2Turn()
-            return
-        column = column - 1
-        row, column = self.board.place_piece(column, self.player2)
-        if row == -1 and column == -1:
-            print("Column is full, please choose another column")
-            self.player2Turn()
-            return
-        print(row, column)
-        if (self.board.check_win(row, column, self.player2)):
-            self.board.print_grid()
-            print("Player 2 wins!")
-            self.game_over = True
-            return
-        if self.board.check_draw():
-            self.board.print_grid()
-            print("Draw!")
-            self.game_over = True
-            return
+        # FOR DEBUG PURPOSES
+        # board.print_grid(game_board)
+        if (not game_end):
+            b = game_board
+            connectFour = ConnectFour(game_board)
+            # col = connectFour.minimax(4, True)
+            print('\n')
+            connectFour.print_grid()
+
+        # YOUR CODE GOES HERE
+
+        # Insert here the action you want to perform based on the output of the algorithm
+        # You can use the following function to select a column
+        random_column = random.randint(0, 6)
+        board.select_column(random_column)
+        time.sleep(2)
+    print(b)
+    print("Website won")
+
+
+if __name__ == "__main__":
+    main()
