@@ -14,9 +14,10 @@ class Game:
 
     def player1Turn(self):
         column = int(input(
-            "Player 1, it's your turn ,enter the column number you want to drop your piece in(1-7): "))
-        if (column < 1 or column > 7):
-            print("Invalid column number, please enter a number between 1 and 7")
+            f"Player 1, it's your turn ,enter the column number you want to drop your piece in(1-{self.board.getNumColumns()}): "))
+        if (column < 1 or column > self.board.getNumColumns()):
+            print(
+                f"Invalid column number, please enter a number between 1 and {self.board.getNumColumns()}")
             self.player1Turn()
             return
         column = column - 1
@@ -39,9 +40,10 @@ class Game:
 
     def player2Turn(self):
         column = int(input(
-            "Player 2, it's your turn ,enter the column number you want to drop your piece in(1-7): "))
-        if (column < 1 or column > 7):
-            print("Invalid column number, please enter a number between 1 and 7")
+            f"Player 2, it's your turn ,enter the column number you want to drop your piece in(1-{self.board.getNumColumns()}): "))
+        if (column < 1 or column > self.board.getNumColumns()):
+            print(
+                f"Invalid column number, please enter a number between 1 and {self.board.getNumColumns()}")
             self.player2Turn()
             return
         column = column - 1
