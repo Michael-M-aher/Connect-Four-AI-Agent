@@ -145,8 +145,8 @@ class ConnectFour:
                     break
         return maxScore
 
-
     # check if board contains a win, lose or draw and return ther score
+
     def is_terminal_node(self, row, col):
         if (self.check_draw()):
             return 0
@@ -169,3 +169,40 @@ class ConnectFour:
                 else:
                     score -= middleFactor / (abs(i - 3) + 1)
         return score
+
+     # calculate the score according to number winning positions
+    def available_wins(self, color):
+        num_wins = 0
+        # i (row) and j(column) are inversed to loop on each column from down to top
+        for j in range(7):
+            for i in range(5, -1, -1):
+                if self.board[i][j] is EMPTY:
+                    break
+
+                if self.board[i][j] == color:
+                    #   d   d    d
+                    #   .   RED  d
+                    #   .   .    .
+                    directions = [(1, 0), (0, 1), (1, 1), (-1, 1)]
+                    for (x, y) in directions:
+                        if (color == RED):
+                            num_wins += self.checkWinWithDirections(i, j, x, y)
+                        else:
+                            num_wins -= self.checkWinWithDirections(i, j, x, y)
+        return num_wins
+
+    # check if there are 3 pieces of the same color or empty in a row in a certain direction
+    def checkWinWithDirections(self, i, j, x, y):
+        for a in range(1, 4):
+            # i = -y
+            # j = x
+            newI = i-(a*y)
+            newJ = j+(a*x)
+            # 1 2 3
+            if (newI < 0 or newI > 5) or (newJ < 0 or newJ > 6):
+                break
+            if (self.board[newI][newJ] == BLUE):
+                break
+            if (a == 3):
+                return 1
+        return 0
