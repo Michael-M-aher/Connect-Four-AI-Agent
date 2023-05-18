@@ -2,13 +2,21 @@ from PIL import ImageGrab
 import pyautogui
 
 # YOU MAY NEED TO CHANGE THESE VALUES BASED ON YOUR SCREEN SIZE
-LEFT = 583
-TOP = 228
-RIGHT = 1339
-BOTTOM = 876
+# LEFT = 583
+# TOP = 228
+# RIGHT = 1339
+# BOTTOM = 876
 
-XSHIFT = 109
-YSHIFT = 107
+LEFT = 583
+TOP = 217
+RIGHT = 1920 - 583
+BOTTOM = 1080 - 219
+
+# XSHIFT = 109
+# YSHIFT = 107
+
+XSHIFT = 108
+YSHIFT = 108
 
 EMPTY = 0
 RED = 1
@@ -30,7 +38,7 @@ class Board:
                 elif grid[i][j] == BLUE:
                     print("B", end=" \t")
             print("\n")
-        print("######################################################################")
+        print("######################################################################\n\n")
 
     def _convert_grid_to_color(self, grid):
         for i in range(0, len(grid)):
