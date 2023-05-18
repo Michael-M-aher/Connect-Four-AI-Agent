@@ -1,17 +1,21 @@
+from board import RED, BLUE, EMPTY
 import math
 
-EMPTY = 0
-RED = 1
-BLUE = 2
+
+middleFactor = 128
+winningFactor = 30
+winScore = 200
+loseScore = -200
 
 
 class ConnectFour:
-    def __init__(self, board, numRows=6, numColumns=7) -> None:
+    def __init__(self, board, maxDepth=5, numRows=6, numColumns=7) -> None:
         self.numRows = numRows
         self.numColumns = numColumns
         # self.board = [[EMPTY for i in range(numColumns)]
         #               for j in range(numRows)]
         self.board = board
+        self.maxDepth = maxDepth
         self.empty_spaces = (numRows*numColumns)
 
     def print_grid(self):
@@ -108,15 +112,6 @@ class ConnectFour:
                 maxScore = score
         return bestColumn
 
-    def is_terminal_node(self, row, col):
-        if (self.check_draw()):
-            return 0
-        elif self.check_win(row, col, RED):
-            return 10000
-        elif self.check_win(row, col, BLUE):
-            return -10000
-        return None
-
     def minimax(self, lastPlay, depth, alpha, beta, maximizing):
         valid = self.find_valid_columns()
         isTerminal = self.is_terminal_node(lastPlay[0], lastPlay[1])
@@ -149,3 +144,28 @@ class ConnectFour:
                 if beta <= alpha:
                     break
         return maxScore
+
+
+    # check if board contains a win, lose or draw and return ther score
+    def is_terminal_node(self, row, col):
+        if (self.check_draw()):
+            return 0
+        elif self.check_win(row, col, RED):
+            return winScore
+        elif self.check_win(row, col, BLUE):
+            return loseScore
+        return None
+
+    # calculate the score according to number of pieces in the middle
+    def getMiddleScore(self, color):
+        score = 0
+        for i in range(7):
+            for j in range(5, -1, -1):
+                # column empty from below
+                if (self.board[j][i] == EMPTY):
+                    break
+                if (self.board[j][i] == color):
+                    score += middleFactor / (abs(i - 3) + 1)
+                else:
+                    score -= middleFactor / (abs(i - 3) + 1)
+        return score
