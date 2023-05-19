@@ -41,7 +41,6 @@ class ConnectFour:
             row = self.board[i]
             if row[column] == EMPTY:
                 row[column] = player
-                self.empty_spaces -= 1
                 return i, column
         return -1, -1
 
@@ -90,6 +89,7 @@ class ConnectFour:
                 return True
             return False
 
+    # return the columns that are valid to place a piece in
     def find_valid_columns(self):
         valid_columns = []
         for i in range(0, self.numColumns):
@@ -97,26 +97,29 @@ class ConnectFour:
                 valid_columns.append(i)
         return valid_columns
 
-    def bestColumn(self):
+    # find the best column to place a piece in by evaluating the score of each column using minimax
+    def bestColumnMinimax(self):
         bestColumn = -1
+        bestRow = -1
         maxScore = -math.inf
         valid = self.find_valid_columns()
         for col in valid:
             (row, column) = self.place_piece(col, RED)
             # call minimax to get the score from the simulation ahead
-            score = self.minimax([row, column], -math.inf,
-                                 math.inf, math.inf, False)
+            score = self.minimax([row, column], BLUE, self.maxDepth, False)
             self.board[row][column] = EMPTY
             if score > maxScore:
                 bestColumn = col
+                bestRow = row
                 maxScore = score
-        return bestColumn
+        return bestColumn, bestRow
 
-    def minimax(self, lastPlay, depth, alpha, beta, maximizing):
+    # minimax algorithm
+    def minimax(self, lastPlay, color, depth, maximizing):
         valid = self.find_valid_columns()
         isTerminal = self.is_terminal_node(lastPlay[0], lastPlay[1])
         if (depth == 0):
-            return -10
+            return self.getMiddleScore(color)+(winningFactor*self.available_wins(color))
         if (isTerminal != None):
             return isTerminal
 
@@ -125,8 +128,53 @@ class ConnectFour:
             for col in valid:
                 (row, column) = self.place_piece(col, RED)
                 # call minimax to get the score from the simulation ahead
-                score = self.minimax(
-                    [row, column], depth-1, alpha, beta, False)
+                score = self.minimax([row, column], BLUE, depth-1, False)
+                self.board[row][column] = EMPTY
+                maxScore = max(maxScore, score)
+        else:
+            maxScore = math.inf
+            for col in valid:
+                (row, column) = self.place_piece(col, BLUE)
+                # call minimax to get the score from the simulation ahead
+                score = self.minimax([row, column], RED, depth-1, True)
+                self.board[row][column] = EMPTY
+                maxScore = min(maxScore, score)
+        return maxScore
+
+    # find the best column to place a piece in by evaluating the score of each column using minimax with alpha beta pruning
+    def bestColumnMinimaxAlphaBeta(self):
+        bestColumn = -1
+        bestRow = -1
+        maxScore = -math.inf
+        valid = self.find_valid_columns()
+        for col in valid:
+            (row, column) = self.place_piece(col, RED)
+            # call minimax to get the score from the simulation ahead
+            score = self.minimaxWithAlphaBeta([row, column], BLUE, self.maxDepth,
+                                              -math.inf, math.inf, False)
+            self.board[row][column] = EMPTY
+            if score > maxScore:
+                bestColumn = col
+                bestRow = row
+                maxScore = score
+        return bestColumn, bestRow
+
+    # minimax algorithm with alpha beta pruning
+    def minimaxWithAlphaBeta(self, lastPlay, color, depth, alpha, beta, maximizing):
+        valid = self.find_valid_columns()
+        isTerminal = self.is_terminal_node(lastPlay[0], lastPlay[1])
+        if (depth == 0):
+            return self.getMiddleScore(color)+(winningFactor*self.available_wins(color))
+        if (isTerminal != None):
+            return isTerminal
+
+        if (maximizing):
+            maxScore = -math.inf
+            for col in valid:
+                (row, column) = self.place_piece(col, RED)
+                # call minimax to get the score from the simulation ahead
+                score = self.minimaxWithAlphaBeta(
+                    [row, column], BLUE, depth-1, alpha, beta, False)
                 self.board[row][column] = EMPTY
                 maxScore = max(maxScore, score)
                 alpha = max(alpha, maxScore)
@@ -137,7 +185,8 @@ class ConnectFour:
             for col in valid:
                 (row, column) = self.place_piece(col, BLUE)
                 # call minimax to get the score from the simulation ahead
-                score = self.minimax([row, column], depth-1, alpha, beta, True)
+                score = self.minimaxWithAlphaBeta(
+                    [row, column], RED, depth-1, alpha, beta, True)
                 self.board[row][column] = EMPTY
                 maxScore = min(maxScore, score)
                 beta = min(beta, maxScore)
@@ -146,7 +195,6 @@ class ConnectFour:
         return maxScore
 
     # check if board contains a win, lose or draw and return ther score
-
     def is_terminal_node(self, row, col):
         if (self.check_draw()):
             return 0
@@ -170,7 +218,7 @@ class ConnectFour:
                     score -= middleFactor / (abs(i - 3) + 1)
         return score
 
-     # calculate the score according to number winning positions
+    # calculate the score according to number winning positions
     def available_wins(self, color):
         num_wins = 0
         # i (row) and j(column) are inversed to loop on each column from down to top
