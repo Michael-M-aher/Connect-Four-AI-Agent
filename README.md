@@ -45,6 +45,14 @@ Please make sure to update tests as appropriate.
 
 - Github: [@MonicaSaeed](https://github.com/MonicaSaeed)
 
+👤 **Moayad Rida**
+
+- Github: [@MonicaSaeed](https://github.com/MoayadR)
+
+👤 **Youstina Saadawy**
+
+- Github: [@MonicaSaeed](https://github.com/Youstinasaadawy)
+
 ## Show your support
 
 Please ⭐️ this repository if this project helped you!
