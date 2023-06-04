@@ -47,11 +47,11 @@ Please make sure to update tests as appropriate.
 
 👤 **Moayad Rida**
 
-- Github: [@MonicaSaeed](https://github.com/MoayadR)
+- Github: [@MoayadR](https://github.com/MoayadR)
 
 👤 **Youstina Saadawy**
 
-- Github: [@MonicaSaeed](https://github.com/Youstinasaadawy)
+- Github: [@Youstinasaadawy](https://github.com/Youstinasaadawy)
 
 ## Show your support
 
